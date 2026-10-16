@@ -3,10 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.patches import Patch
-import time
 
-st.set_page_config(page_title="补肾固冲丸机制探索平台", layout="wide")
+st.set_page_config(page_title="补肾固冲汤机制探索平台", layout="wide")
 
 st.sidebar.title("导航菜单")
 page = st.sidebar.radio("选择模块", [
@@ -17,7 +15,6 @@ page = st.sidebar.radio("选择模块", [
     "成分-靶点网络"
 ])
 
-# ========== 首页概览 ==========
 if page == "首页概览":
     st.title("🌿 补肾固冲汤调控蜕膜巨噬细胞谷氨酸代谢重编程")
     st.subheader("诱导母胎免疫耐受关键机制研究 - 数智化交互平台")
@@ -33,7 +30,6 @@ if page == "首页概览":
     col3.metric("💊 核心方剂", "补肾固冲汤", delta="8味中药")
     col4.metric("🎯 关键靶点", "EAAT1/ACSL4", delta="铁死亡调控")
 
-# ========== 机制通路图 ==========
 elif page == "机制通路图":
     st.subheader("📊 URSA发病机制与补肾固冲汤干预通路")
     st.markdown("""
@@ -123,13 +119,15 @@ elif page == "机制通路图":
         补肾固冲汤通过 **上调 EAAT1** → 恢复谷氨酸代谢稳态 → 抑制铁死亡 → 重塑母胎免疫耐受。
         """)
 
-# ========== 数据可视化 ==========
 elif page == "数据可视化":
     st.subheader("📈 预实验数据展示")
     st.markdown("""
     以下数据来自本项目前期预实验，展示了 URSA 患者与正常妊娠（NP）对照之间
     蜕膜巨噬细胞亚群、谷氨酸代谢及铁死亡指标的差异。
     """)
+    
+    import matplotlib.pyplot as plt
+    import numpy as np
     
     plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
     plt.rcParams['axes.unicode_minus'] = False
@@ -253,7 +251,6 @@ elif page == "数据可视化":
     *以上数据为本项目前期预实验基础，支持项目科学假说。*
     """)
 
-# ========== 风险预测模型 ==========
 elif page == "风险预测模型":
     st.subheader("🧠 URSA 风险预测模型（演示版）")
     st.markdown("""
@@ -318,7 +315,6 @@ elif page == "风险预测模型":
         with col_result3:
             st.metric("模型准确率", f"{train_acc*100:.1f}%")
 
-# ========== 成分-靶点网络 ==========
 elif page == "成分-靶点网络":
     st.subheader("🌐 补肾固冲汤“成分-靶点”热力图")
     
@@ -387,103 +383,142 @@ elif page == "成分-靶点网络":
             herb_df = df.loc[comps]
         st.dataframe(herb_df, use_container_width=True)
     
-    # ========================================
-    # 🧠 AI智能配比模块（精简版，确保显示）
-    # ========================================
+    # ===== 智能配比与数智化生产模块 =====
     st.markdown("---")
-    st.markdown("### 🧠 AI智能配比：基于机制通路的药材用量优化")
+    st.markdown("### 🏭 智能配比与数智化生产工艺")
     st.markdown("""
-    基于 **成分-靶点网络** 和 **EAAT1-α-KG-FTO/ACSL4-m6A 信号轴**，
-    采用 **多目标优化算法** 智能计算各药材最优配比。
+    基于 **"四核工艺"** 闭环体系，实现从原料到成品的全程数字化控制：
     """)
     
-    # 定义药材-靶点贡献度
-    herb_target = {
-        '菟丝子': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 2, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-        '桑寄生': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 4, 'NFE2L2': 2, 'IL10': 1, 'TNF': 1},
-        '杜仲': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-        '阿胶': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 3, 'TNF': 1},
-        '陈皮': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 4},
-        '黄芩': {'EAAT1': 5, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-        '白术': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 4, 'TNF': 1},
-        '甘草': {'EAAT1': 1, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 3, 'IL10': 1, 'TNF': 1},
-    }
+    col_proc1, col_arrow1, col_proc2, col_arrow2, col_proc3, col_arrow3, col_proc4 = st.columns([2, 0.3, 2, 0.3, 2, 0.3, 2])
     
-    herb_role = {'菟丝子': '君药', '桑寄生': '君药', '杜仲': '臣药', '阿胶': '臣药',
-                 '陈皮': '佐药', '黄芩': '佐药', '白术': '佐药', '甘草': '使药'}
-    role_weight = {'君药': 1.4, '臣药': 1.2, '佐药': 1.0, '使药': 0.8}
-    
-    all_herbs = ['菟丝子', '桑寄生', '杜仲', '阿胶', '陈皮', '黄芩', '白术', '甘草']
-    target_list = ['EAAT1', 'ACSL4', 'FTO', 'GPX4', 'SLC7A11', 'NFE2L2', 'IL10', 'TNF']
-    
-    # 用户输入
-    st.markdown("#### 🎯 设定靶点优先级")
-    c1, c2 = st.columns(2)
-    with c1:
-        p1 = st.slider("EAAT1（谷氨酸转运）", 1, 10, 10, key="ai_p1")
-        p2 = st.slider("ACSL4（铁死亡抑制）", 1, 10, 9, key="ai_p2")
-        p3 = st.slider("FTO（m6A去甲基化）", 1, 10, 8, key="ai_p3")
-        p4 = st.slider("GPX4（抗氧化保护）", 1, 10, 7, key="ai_p4")
-    with c2:
-        p5 = st.slider("SLC7A11（胱氨酸转运）", 1, 10, 6, key="ai_p5")
-        p6 = st.slider("NFE2L2（氧化应激）", 1, 10, 5, key="ai_p6")
-        p7 = st.slider("IL10（抗炎）", 1, 10, 6, key="ai_p7")
-        p8 = st.slider("TNF（促炎抑制）", 1, 10, 5, key="ai_p8")
-    
-    priorities = {'EAAT1': p1, 'ACSL4': p2, 'FTO': p3, 'GPX4': p4,
-                  'SLC7A11': p5, 'NFE2L2': p6, 'IL10': p7, 'TNF': p8}
-    
-    if st.button("🧠 执行AI智能配比", type="primary"):
-        with st.spinner("AI正在计算..."):
-            time.sleep(1)
-        
-        # 计算每个药材的得分
-        scores = {}
-        for herb in all_herbs:
-            score = 0
-            for target in target_list:
-                score += herb_target[herb][target] * priorities[target]
-            score = score * role_weight[herb_role[herb]]
-            scores[herb] = score
-        
-        total = sum(scores.values())
-        ratios = {h: round(scores[h] / total * 100, 1) for h in all_herbs}
-        
-        # 显示结果
-        st.markdown("---")
-        st.markdown("#### 📊 配比结果")
-        
-        # 柱状图
-        fig, ax = plt.subplots(figsize=(10, 4))
-        colors = ['#E74C3C' if herb_role[h] == '君药' else '#F1C40F' if herb_role[h] == '臣药' else '#3498DB' for h in all_herbs]
-        bars = ax.bar(all_herbs, [ratios[h] for h in all_herbs], color=colors)
-        ax.set_ylabel('配比 (%)')
-        ax.set_title('AI智能配比结果')
-        ax.set_ylim(0, max([ratios[h] for h in all_herbs]) + 5)
-        for bar, h in zip(bars, all_herbs):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
-                   f'{ratios[h]}%', ha='center', fontsize=10, fontweight='bold')
-        
-        legend_elements = [
-            Patch(facecolor='#E74C3C', label='君药'),
-            Patch(facecolor='#F1C40F', label='臣药'),
-            Patch(facecolor='#3498DB', label='佐使药')
-        ]
-        ax.legend(handles=legend_elements, loc='upper right')
-        st.pyplot(fig)
-        
-        # 配比表
-        data = []
-        for h in all_herbs:
-            data.append({'药材': h, '角色': herb_role[h], '配比(%)': ratios[h], '建议用量(g/剂)': round(ratios[h] / 10 * 3, 1)})
-        st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
-        
-        # 验证
+    with col_proc1:
         st.markdown("""
-        <div style='background: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'>
-            <b>✅ 机制通路验证通过</b><br>
-            AI配比方案可有效激活 <b>EAAT1-α-KG-FTO/ACSL4-m6A</b> 信号轴。
+        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
+            <h3 style='margin:0;'>❄️</h3>
+            <h4 style='margin:5px 0;'>低温粉碎</h4>
+            <p style='font-size:12px; margin:0;'>热敏成分零流失<br>保全有效成分</p>
+            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺①</span>
         </div>
         """, unsafe_allow_html=True)
     
-    st.info("💡 设定靶点优先级，点击'执行AI智能配比'按钮查看优化结果。")
+    with col_arrow1:
+        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
+    
+    with col_proc2:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
+            <h3 style='margin:0;'>🧪</h3>
+            <h4 style='margin:5px 0;'>树脂精制</h4>
+            <p style='font-size:12px; margin:0;'>分离纯化提纯度<br>有效成分转移率↑</p>
+            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺②</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_arrow2:
+        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
+    
+    with col_proc3:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
+            <h3 style='margin:0;'>📊</h3>
+            <h4 style='margin:5px 0;'>在线检测</h4>
+            <p style='font-size:12px; margin:0;'>批次间一致性<br>提升 <b style='color:#f1c40f;'>30%</b></p>
+            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺③</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_arrow3:
+        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
+    
+    with col_proc4:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #d4af37, #f1c40f); padding: 15px; border-radius: 12px; text-align: center; color: #1a5276;'>
+            <h3 style='margin:0;'>⏳</h3>
+            <h4 style='margin:5px 0;'>缓释包衣</h4>
+            <p style='font-size:12px; margin:0;'>血药浓度平稳长效<br>患者依从性提升</p>
+            <span style='background:rgba(26,82,118,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺④</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("### 📊 智能配比核心指标")
+    
+    col_metric1, col_metric2, col_metric3, col_metric4 = st.columns(4)
+    
+    with col_metric1:
+        st.metric("🏷️ 批次均一性", "提升 30%", delta="vs 传统工艺")
+    with col_metric2:
+        st.metric("📈 有效成分转移率", "≥ 92%", delta="提升 15%")
+    with col_metric3:
+        st.metric("🔗 图码追溯覆盖率", "≥ 95%", delta="全程可追溯")
+    with col_metric4:
+        st.metric("💊 血药浓度平稳度", "CV < 15%", delta="平稳长效")
+    
+    st.markdown("---")
+    st.markdown("### 📱 图码追溯系统 —— 每瓶唯一ID，扫码可查全程")
+    
+    col_trace1, col_trace2 = st.columns([1, 1])
+    
+    with col_trace1:
+        st.markdown("""
+        <div style='background: #f0f4f8; padding: 20px; border-radius: 12px; border-left: 5px solid #1a5276;'>
+            <b>🔍 追溯信息示例</b><br><br>
+            <b>唯一ID：</b>BSGC-2026-001234<br>
+            <b>种植基地：</b>内蒙古通辽市奈曼旗 GAP基地<br>
+            <b>采收时间：</b>2026年8月<br>
+            <b>检测报告：</b>符合《中国药典》标准<br>
+            <b>生产工艺：</b>低温粉碎 → 树脂精制 → 在线检测 → 缓释包衣<br>
+            <b>有效期至：</b>2029年8月
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_trace2:
+        st.markdown("""
+        <div style='background: #1a5276; padding: 20px; border-radius: 12px; color: white; text-align: center;'>
+            <p style='font-size: 60px; margin: 0;'>📱</p>
+            <h3>扫码追溯</h3>
+            <p style='font-size: 14px; opacity: 0.8;'>每瓶唯一ID · 数据采集率 ≥ 95%</p>
+            <div style='background: white; padding: 15px; border-radius: 8px; margin-top: 10px;'>
+                <p style='color: #1a5276; font-size: 12px; margin: 0;'>⬛ 二维码占位 ⬛</p>
+                <p style='color: #1a5276; font-size: 11px; margin: 5px 0 0 0;'>扫码查看完整溯源信息</p>
+            </div>
+            <p style='font-size: 12px; opacity: 0.7; margin-top: 10px;'>从田间到病床 · 全流程可追溯 · 批次间均一</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.info("💡 **从“经验制药”到“数据智造”** —— 以数智化赋能中药智造，守护每一份生育希望")
+    
+    st.success("""
+    ### 🎯 核心发现
+    
+    1. **多成分协同作用**：8味中药的活性成分通过**多靶点**协同发挥治疗作用
+    
+    2. **核心成分**：
+       - **黄芩苷**：同时靶向 EAAT1 和 ACSL4（关联强度最高）
+       - **金丝桃苷、桃叶珊瑚苷**：特异性靶向 EAAT1
+       - **甘草酸**：靶向 ACSL4 和 NFE2L2
+    
+    3. **核心靶点**：
+       - **EAAT1**：谷氨酸转运蛋白，dM2细胞特异性靶点（被6个成分调控）
+       - **ACSL4**：铁死亡关键调控因子（被3个成分调控）
+       - **FTO**：m6A表观遗传调控酶（被2个成分调控）
+    
+    4. **中医理论支撑**：
+       网络结果与 **"肾主生殖"** 理论高度契合，
+       体现了补肾固冲汤 **"多靶点-多通路"** 的系统调控特征。
+    """)
+    
+    with st.expander("🔬 点击查看靶点功能说明"):
+        st.markdown("""
+        | 靶点 | 中文名称 | 功能 | 与URSA关联 |
+        |------|----------|------|------------|
+        | **EAAT1** | 兴奋性氨基酸转运蛋白1 | 谷氨酸跨膜转运 | ★★★★★ 核心 |
+        | **ACSL4** | 长链脂酰CoA合成酶4 | 铁死亡执行基因 | ★★★★★ 核心 |
+        | **FTO** | 脂肪量与肥胖相关蛋白 | m6A去甲基化酶 | ★★★★★ 核心 |
+        | **GPX4** | 谷胱甘肽过氧化物酶4 | 铁死亡抑制因子 | ★★★★☆ 关键 |
+        | **SLC7A11** | 胱氨酸/谷氨酸转运蛋白 | 抗氧化系统 | ★★★★☆ 关键 |
+        | **NFE2L2** | 核因子E2相关因子2 | 氧化应激调控 | ★★★☆☆ 重要 |
+        | **IL10** | 白细胞介素-10 | 抗炎细胞因子 | ★★★☆☆ 重要 |
+        | **TNF** | 肿瘤坏死因子 | 促炎细胞因子 | ★★★☆☆ 重要 |
+        """)
