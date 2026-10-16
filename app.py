@@ -2,6 +2,21 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
+
+# 自动寻找服务器上的中文字体
+font_paths = [
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+    "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+]
+for p in font_paths:
+    if os.path.exists(p):
+        plt.rcParams['font.sans-serif'] = [fm.FontProperties(fname=p).get_name()]
+        break
+plt.rcParams['axes.unicode_minus'] = False
 import seaborn as sns
 
 st.set_page_config(
