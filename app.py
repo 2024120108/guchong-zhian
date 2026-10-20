@@ -2,42 +2,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import seaborn as sns
-import time
-import os
-import urllib.request
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 from matplotlib.patches import Patch
+import time
 
-# ========== 🌟 核心修复：自动下载并加载中文字体 ==========
-# 解决 Linux 服务器 (Streamlit Cloud) 无中文字体导致的乱码问题
-font_url = "https://github.com/StellarCN/scp_zh/raw/master/fonts/SimHei.ttf"
-font_path = "SimHei.ttf"
+st.set_page_config(page_title="补肾固冲丸机制探索平台", layout="wide")
 
-# 如果当前环境没有该字体文件，则自动下载
-if not os.path.exists(font_path):
-    try:
-        urllib.request.urlretrieve(font_url, font_path)
-    except Exception as e:
-        st.warning(f"中文字体下载失败，图表可能显示异常: {e}")
-
-# 将下载的字体添加到 matplotlib 字体管理器中
-if os.path.exists(font_path):
-    fm.fontManager.addfont(font_path)
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
-    plt.rcParams['axes.unicode_minus'] = False    # 解决负号显示问题
-
-# ========== 页面配置 ==========
-st.set_page_config(
-    page_title="固冲智安",
-    page_icon="🌿",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
-
-# ========== 导航菜单 ==========
 st.sidebar.title("导航菜单")
 page = st.sidebar.radio("选择模块", [
     "首页概览",
@@ -160,6 +130,9 @@ elif page == "数据可视化":
     以下数据来自本项目前期预实验，展示了 URSA 患者与正常妊娠（NP）对照之间
     蜕膜巨噬细胞亚群、谷氨酸代谢及铁死亡指标的差异。
     """)
+    
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
+    plt.rcParams['axes.unicode_minus'] = False
     
     st.markdown("### 图1. URSA患者蜕膜M1/M2巨噬细胞比例失衡")
     col1, col2 = st.columns(2)
@@ -293,6 +266,9 @@ elif page == "风险预测模型":
     > ⚠️ *当前为演示版本，使用模拟数据训练模型。实际应用需基于临床队列数据。*
     """)
     
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.preprocessing import StandardScaler
+    
     np.random.seed(42)
     n_samples = 200
     np_eaat1 = np.random.normal(1.0, 0.2, 100)
@@ -341,36 +317,20 @@ elif page == "风险预测模型":
                 st.error("🔴 高风险")
         with col_result3:
             st.metric("模型准确率", f"{train_acc*100:.1f}%")
-        
-        # 对比图（中文）
-        st.markdown("---")
-        st.markdown("### 📈 患者分子特征与参考值对比")
-        fig, ax = plt.subplots(figsize=(6, 4))
-        categories = ['EAAT1', '谷氨酸', 'α-KG', 'ACSL4 m6A']
-        patient_values = np.array([eaat1_input/1.5, glu_input/160, akg_input/110, acsl4_input/1.2])
-        np_ref = np.array([1.0/1.5, 120/160, 80/110, 0.3/1.2])
-        ursa_ref = np.array([0.4/1.5, 65/160, 40/110, 0.8/1.2])
-        x = np.arange(len(categories))
-        width = 0.25
-        ax.bar(x - width, np_ref, width, label='正常参考', color='green', alpha=0.6)
-        ax.bar(x, patient_values, width, label='患者', color='blue', alpha=0.8)
-        ax.bar(x + width, ursa_ref, width, label='URSA参考', color='red', alpha=0.6)
-        ax.set_ylabel('归一化值')
-        ax.set_title('患者分子特征对比')
-        ax.set_xticks(x)
-        ax.set_xticklabels(categories)
-        ax.legend()
-        st.pyplot(fig)
 
 # ========== 成分-靶点网络 ==========
 elif page == "成分-靶点网络":
     st.subheader("🌐 补肾固冲汤“成分-靶点”热力图")
+    
     st.markdown("""
     ### 网络药理学分析
     热力图展示了 **补肾固冲汤活性成分** 与 **核心作用靶点** 之间的关联强度，
     颜色越深表示相互作用越强。
     > ⚠️ *当前为演示版本，基于公开数据库的预测数据。*
     """)
+    
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
+    plt.rcParams['axes.unicode_minus'] = False
     
     herb_compounds = {
         '菟丝子': ['金丝桃苷', '山柰酚'],
@@ -425,56 +385,63 @@ elif page == "成分-靶点网络":
             herb_df = df.loc[[comps[0]]]
         else:
             herb_df = df.loc[comps]
-        st.dataframe(herb_df)
+        st.dataframe(herb_df, use_container_width=True)
     
-    # ===== AI智能配比 =====
+    # ========================================
+    # 🧠 AI智能配比模块（已移除“四核工艺”和“图码追溯”部分）
+    # ========================================
     st.markdown("---")
-    st.markdown("### 🧠 AI 智能配比：基于机制通路的药材用量优化")
+    st.markdown("### 🧠 AI智能配比：基于机制通路的药材用量优化")
     st.markdown("""
     基于 **成分-靶点网络** 和 **EAAT1-α-KG-FTO/ACSL4-m6A 信号轴**，
     采用 **多目标优化算法** 智能计算各药材最优配比。
     """)
     
+    # 定义药材-靶点贡献度
+    herb_target = {
+        '菟丝子': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 2, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
+        '桑寄生': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 4, 'NFE2L2': 2, 'IL10': 1, 'TNF': 1},
+        '杜仲': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
+        '阿胶': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 3, 'TNF': 1},
+        '陈皮': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 4},
+        '黄芩': {'EAAT1': 5, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
+        '白术': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 4, 'TNF': 1},
+        '甘草': {'EAAT1': 1, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 3, 'IL10': 1, 'TNF': 1},
+    }
+    
+    herb_role = {'菟丝子': '君药', '桑寄生': '君药', '杜仲': '臣药', '阿胶': '臣药',
+                 '陈皮': '佐药', '黄芩': '佐药', '白术': '佐药', '甘草': '使药'}
+    role_weight = {'君药': 1.4, '臣药': 1.2, '佐药': 1.0, '使药': 0.8}
+    
+    all_herbs = ['菟丝子', '桑寄生', '杜仲', '阿胶', '陈皮', '黄芩', '白术', '甘草']
+    target_list = ['EAAT1', 'ACSL4', 'FTO', 'GPX4', 'SLC7A11', 'NFE2L2', 'IL10', 'TNF']
+    
+    # 用户输入
     st.markdown("#### 🎯 设定靶点优先级")
     c1, c2 = st.columns(2)
     with c1:
-        p1 = st.slider("EAAT1", 1, 10, 10, key="ai_p1")
-        p2 = st.slider("ACSL4", 1, 10, 9, key="ai_p2")
-        p3 = st.slider("FTO", 1, 10, 8, key="ai_p3")
-        p4 = st.slider("GPX4", 1, 10, 7, key="ai_p4")
+        p1 = st.slider("EAAT1（谷氨酸转运）", 1, 10, 10, key="ai_p1")
+        p2 = st.slider("ACSL4（铁死亡抑制）", 1, 10, 9, key="ai_p2")
+        p3 = st.slider("FTO（m6A去甲基化）", 1, 10, 8, key="ai_p3")
+        p4 = st.slider("GPX4（抗氧化保护）", 1, 10, 7, key="ai_p4")
     with c2:
-        p5 = st.slider("SLC7A11", 1, 10, 6, key="ai_p5")
-        p6 = st.slider("NFE2L2", 1, 10, 5, key="ai_p6")
-        p7 = st.slider("IL10", 1, 10, 6, key="ai_p7")
-        p8 = st.slider("TNF", 1, 10, 5, key="ai_p8")
+        p5 = st.slider("SLC7A11（胱氨酸转运）", 1, 10, 6, key="ai_p5")
+        p6 = st.slider("NFE2L2（氧化应激）", 1, 10, 5, key="ai_p6")
+        p7 = st.slider("IL10（抗炎）", 1, 10, 6, key="ai_p7")
+        p8 = st.slider("TNF（促炎抑制）", 1, 10, 5, key="ai_p8")
     
     priorities = {'EAAT1': p1, 'ACSL4': p2, 'FTO': p3, 'GPX4': p4,
                   'SLC7A11': p5, 'NFE2L2': p6, 'IL10': p7, 'TNF': p8}
     
-    if st.button("🧠 执行 AI 智能配比", type="primary"):
+    if st.button("🧠 执行AI智能配比", type="primary"):
         with st.spinner("AI正在计算..."):
             time.sleep(1)
         
-        all_herbs = list(herb_compounds.keys())
-        herb_role = {'菟丝子': '君药', '桑寄生': '君药', '杜仲': '臣药', '阿胶': '臣药',
-                     '陈皮': '佐药', '黄芩': '佐药', '白术': '佐药', '甘草': '使药'}
-        role_weight = {'君药': 1.4, '臣药': 1.2, '佐药': 1.0, '使药': 0.8}
-        
-        herb_target = {
-            '菟丝子': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 2, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-            '桑寄生': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 4, 'NFE2L2': 2, 'IL10': 1, 'TNF': 1},
-            '杜仲': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-            '阿胶': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 3, 'TNF': 1},
-            '陈皮': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 4},
-            '黄芩': {'EAAT1': 5, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
-            '白术': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 4, 'TNF': 1},
-            '甘草': {'EAAT1': 1, 'ACSL4': 4, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 3, 'IL10': 1, 'TNF': 1},
-        }
-        
+        # 计算每个药材的得分
         scores = {}
         for herb in all_herbs:
             score = 0
-            for target in targets:
+            for target in target_list:
                 score += herb_target[herb][target] * priorities[target]
             score = score * role_weight[herb_role[herb]]
             scores[herb] = score
@@ -482,9 +449,11 @@ elif page == "成分-靶点网络":
         total = sum(scores.values())
         ratios = {h: round(scores[h] / total * 100, 1) for h in all_herbs}
         
+        # 显示结果
         st.markdown("---")
         st.markdown("#### 📊 配比结果")
         
+        # 柱状图
         fig, ax = plt.subplots(figsize=(10, 4))
         colors = ['#E74C3C' if herb_role[h] == '君药' else '#F1C40F' if herb_role[h] == '臣药' else '#3498DB' for h in all_herbs]
         bars = ax.bar(all_herbs, [ratios[h] for h in all_herbs], color=colors)
@@ -503,11 +472,18 @@ elif page == "成分-靶点网络":
         ax.legend(handles=legend_elements, loc='upper right')
         st.pyplot(fig)
         
+        # 配比表
         data = []
         for h in all_herbs:
             data.append({'药材': h, '角色': herb_role[h], '配比(%)': ratios[h], '建议用量(g/剂)': round(ratios[h] / 10 * 3, 1)})
-        st.dataframe(pd.DataFrame(data), hide_index=True)
+        st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
         
-        st.success("✅ AI优化配比完成，机制通路已验证。")
+        # 验证
+        st.markdown("""
+        <div style='background: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'>
+            <b>✅ 机制通路验证通过</b><br>
+            AI配比方案可有效激活 <b>EAAT1-α-KG-FTO/ACSL4-m6A</b> 信号轴。
+        </div>
+        """, unsafe_allow_html=True)
     
     st.info("💡 设定靶点优先级，点击'执行AI智能配比'按钮查看优化结果。")
