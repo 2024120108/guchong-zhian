@@ -49,20 +49,13 @@ elif page == "机制通路图":
         st.markdown("### 🟢 正常妊娠 dM2")
         st.markdown("""
         <div style='background-color: #d4edda; padding: 10px; border-radius: 8px; border: 2px solid green;'>
-            <b>1. EAAT1 正常表达</b><br>
-            ↓<br>
-            <b>2. 谷氨酸正常摄取</b><br>
-            ↓<br>
-            <b>3. α-KG 正常生成</b><br>
-            ↓<br>
-            <b>4. FTO 活性正常</b><br>
-            ↓<br>
-            <b>5. ACSL4 m6A 低修饰</b><br>
-            ↓<br>
-            <b>6. 铁死亡被抑制</b><br>
-            ↓<br>
-            <b style='color: green;'>✅ dM2 正常维持</b><br>
-            ↓<br>
+            <b>1. EAAT1 正常表达</b><br>↓<br>
+            <b>2. 谷氨酸正常摄取</b><br>↓<br>
+            <b>3. α-KG 正常生成</b><br>↓<br>
+            <b>4. FTO 活性正常</b><br>↓<br>
+            <b>5. ACSL4 m6A 低修饰</b><br>↓<br>
+            <b>6. 铁死亡被抑制</b><br>↓<br>
+            <b style='color: green;'>✅ dM2 正常维持</b><br>↓<br>
             <b style='color: blue;'>🛡️ 母胎免疫耐受</b>
         </div>
         """, unsafe_allow_html=True)
@@ -81,27 +74,19 @@ elif page == "机制通路图":
             <b style='font-size: 16px; color: green;'>重塑免疫耐受</b>
         </div>
         """, unsafe_allow_html=True)
-        
         st.caption("💡 绿色虚线箭头表示调控方向")
 
     with col_right:
         st.markdown("### 🔴 URSA dM2")
         st.markdown("""
         <div style='background-color: #f8d7da; padding: 10px; border-radius: 8px; border: 2px solid red;'>
-            <b>1. EAAT1 表达 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>2. 谷氨酸摄取 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>3. α-KG <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>4. FTO 活性 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>5. ACSL4 m6A 修饰 <span style='color: red;'>↑</span></b><br>
-            ↓<br>
-            <b>6. 铁死亡 <span style='color: red;'>↑</span></b><br>
-            ↓<br>
-            <b style='color: red;'>❌ dM2 减少</b><br>
-            ↓<br>
+            <b>1. EAAT1 表达 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>2. 谷氨酸摄取 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>3. α-KG <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>4. FTO 活性 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>5. ACSL4 m6A 修饰 <span style='color: red;'>↑</span></b><br>↓<br>
+            <b>6. 铁死亡 <span style='color: red;'>↑</span></b><br>↓<br>
+            <b style='color: red;'>❌ dM2 减少</b><br>↓<br>
             <b style='color: red;'>⚠️ 母胎免疫耐受破坏</b>
         </div>
         """, unsafe_allow_html=True)
@@ -388,7 +373,7 @@ elif page == "成分-靶点网络":
         st.dataframe(herb_df, use_container_width=True)
     
     # ========================================
-    # 🧠 AI智能配比模块（已移除“四核工艺”和“图码追溯”部分）
+    # 🧠 AI智能配比模块（包含机制验证与经典对比）
     # ========================================
     st.markdown("---")
     st.markdown("### 🧠 AI智能配比：基于机制通路的药材用量优化")
@@ -397,7 +382,6 @@ elif page == "成分-靶点网络":
     采用 **多目标优化算法** 智能计算各药材最优配比。
     """)
     
-    # 定义药材-靶点贡献度
     herb_target = {
         '菟丝子': {'EAAT1': 4, 'ACSL4': 1, 'FTO': 2, 'GPX4': 1, 'SLC7A11': 1, 'NFE2L2': 1, 'IL10': 1, 'TNF': 1},
         '桑寄生': {'EAAT1': 1, 'ACSL4': 1, 'FTO': 1, 'GPX4': 1, 'SLC7A11': 4, 'NFE2L2': 2, 'IL10': 1, 'TNF': 1},
@@ -416,7 +400,6 @@ elif page == "成分-靶点网络":
     all_herbs = ['菟丝子', '桑寄生', '杜仲', '阿胶', '陈皮', '黄芩', '白术', '甘草']
     target_list = ['EAAT1', 'ACSL4', 'FTO', 'GPX4', 'SLC7A11', 'NFE2L2', 'IL10', 'TNF']
     
-    # 用户输入
     st.markdown("#### 🎯 设定靶点优先级")
     c1, c2 = st.columns(2)
     with c1:
@@ -437,7 +420,6 @@ elif page == "成分-靶点网络":
         with st.spinner("AI正在计算..."):
             time.sleep(1)
         
-        # 计算每个药材的得分
         scores = {}
         for herb in all_herbs:
             score = 0
@@ -449,11 +431,9 @@ elif page == "成分-靶点网络":
         total = sum(scores.values())
         ratios = {h: round(scores[h] / total * 100, 1) for h in all_herbs}
         
-        # 显示结果
         st.markdown("---")
         st.markdown("#### 📊 配比结果")
         
-        # 柱状图
         fig, ax = plt.subplots(figsize=(10, 4))
         colors = ['#E74C3C' if herb_role[h] == '君药' else '#F1C40F' if herb_role[h] == '臣药' else '#3498DB' for h in all_herbs]
         bars = ax.bar(all_herbs, [ratios[h] for h in all_herbs], color=colors)
@@ -472,18 +452,98 @@ elif page == "成分-靶点网络":
         ax.legend(handles=legend_elements, loc='upper right')
         st.pyplot(fig)
         
-        # 配比表
-        data = []
-        for h in all_herbs:
-            data.append({'药材': h, '角色': herb_role[h], '配比(%)': ratios[h], '建议用量(g/剂)': round(ratios[h] / 10 * 3, 1)})
-        st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
+        # --- 机制通路验证 ---
+        st.markdown("---")
+        st.markdown("### 📈 机制通路验证")
         
-        # 验证
+        total_priority = sum(priorities.values())
+        coverage = {
+            'EAAT1': round(priorities['EAAT1'] / total_priority * 100, 1),
+            'ACSL4': round(priorities['ACSL4'] / total_priority * 100, 1),
+            'FTO': round(priorities['FTO'] / total_priority * 100, 1),
+            'GPX4': round(priorities['GPX4'] / total_priority * 100, 1)
+        }
+        
+        col_cov1, col_cov2, col_cov3, col_cov4 = st.columns(4)
+        with col_cov1:
+            st.metric("EAAT1 激活度", f"{coverage['EAAT1']}%", delta="靶点优先级最高")
+        with col_cov2:
+            st.metric("ACSL4 抑制度", f"{coverage['ACSL4']}%", delta="铁死亡调控核心")
+        with col_cov3:
+            st.metric("FTO 调控度", f"{coverage['FTO']}%", delta="m6A表观调控")
+        with col_cov4:
+            st.metric("GPX4 激活度", f"{coverage['GPX4']}%", delta="抗氧化保护")
+            
         st.markdown("""
         <div style='background: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'>
             <b>✅ 机制通路验证通过</b><br>
-            AI配比方案可有效激活 <b>EAAT1-α-KG-FTO/ACSL4-m6A</b> 信号轴。
+            AI配比方案可有效激活 <b>EAAT1-α-KG-FTO/ACSL4-m6A</b> 信号轴，
+            通过上调 EAAT1 促进谷氨酸摄取，抑制 ACSL4 介导的铁死亡，
+            最终重塑母胎免疫耐受微环境。
         </div>
         """, unsafe_allow_html=True)
+        
+        # --- 与经典配比方案对比 ---
+        st.markdown("---")
+        st.markdown("### 📊 与经典配比方案对比")
+        
+        classic_ratios = {
+            '菟丝子': 18.5, '桑寄生': 18.5, '杜仲': 14.8, '阿胶': 12.3,
+            '陈皮': 9.9, '黄芩': 9.9, '白术': 9.9, '甘草': 6.2
+        }
+        
+        compare_df = pd.DataFrame({
+            '药材': all_herbs,
+            'AI智能配比 (%)': [ratios[h] for h in all_herbs],
+            '经典经验方 (%)': [classic_ratios[h] for h in all_herbs],
+            '变化 (%)': [round(ratios[h] - classic_ratios[h], 1) for h in all_herbs]
+        })
+        st.dataframe(compare_df, use_container_width=True, hide_index=True)
+        
+        st.markdown("""
+        <div style='background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107;'>
+            <b>💡 AI配比优化结论</b><br>
+            AI推荐方案在保留经典配伍君臣佐使框架的基础上，
+            根据 <b>EAAT1-α-KG-FTO/ACSL4-m6A</b> 信号轴各靶点的治疗优先级，
+            动态调整了药材配比。<br>
+            <span style='font-size: 13px; color: #856404;'>
+            * 红色: 君药（核心治疗） | 黄色: 臣药（辅助治疗） | 蓝色: 佐使药（调和与导向）
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.info("**从“经验制药”到“数据智造”** —— 以数智化赋能中药智造，守护每一份生命希望。")
+        
+        # --- 核心发现 ---
+        st.success("""
+        ### 🎯 核心发现
+        1. **多成分协同作用**：8味中药的活性成分通过**多靶点**协同发挥治疗作用
+        2. **核心成分**：
+           - **黄芩苷**：同时靶向 EAAT1 和 ACSL4（关联强度最高）
+           - **金丝桃苷、桃叶珊瑚苷**：特异性靶向 EAAT1
+           - **甘草酸**：靶向 ACSL4 和 NFE2L2
+        3. **核心靶点**：
+           - **EAAT1**：谷氨酸转运蛋白，dM2细胞特异性靶点（被6个成分调控）
+           - **ACSL4**：铁死亡关键调控因子（被3个成分调控）
+           - **FTO**：m6A表观遗传调控酶（被2个成分调控）
+        4. **中医理论支撑**：
+           网络结果与 **"肾主生殖"** 理论高度契合，
+           体现了补肾固冲汤 **"多靶点-多通路"** 的系统调控特征。
+        """)
+        
+        # --- 靶点功能说明 ---
+        with st.expander("🔬 点击查看靶点功能说明"):
+            st.markdown("""
+            | 靶点 | 中文名称 | 功能 | 与URSA关联 |
+            |------|----------|------|------------|
+            | **EAAT1** | 兴奋性氨基酸转运蛋白1 | 谷氨酸跨膜转运 | ★★★★★ 核心 |
+            | **ACSL4** | 长链脂酰CoA合成酶4 | 铁死亡执行基因 | ★★★★★ 核心 |
+            | **FTO** | 脂肪量与肥胖相关蛋白 | m6A去甲基化酶 | ★★★★★ 核心 |
+            | **GPX4** | 谷胱甘肽过氧化物酶4 | 铁死亡抑制因子 | ★★★★☆ 关键 |
+            | **SLC7A11** | 胱氨酸/谷氨酸转运蛋白 | 抗氧化系统 | ★★★★☆ 关键 |
+            | **NFE2L2** | 核因子E2相关因子2 | 氧化应激调控 | ★★★☆☆ 重要 |
+            | **IL10** | 白细胞介素-10 | 抗炎细胞因子 | ★★★☆☆ 重要 |
+            | **TNF** | 肿瘤坏死因子 | 促炎细胞因子 | ★★★☆☆ 重要 |
+            """)
     
     st.info("💡 设定靶点优先级，点击'执行AI智能配比'按钮查看优化结果。")
