@@ -3,9 +3,64 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+import matplotlib.font_manager as fm
+import time
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from matplotlib.patches import Patch
 
-st.set_page_config(page_title="补肾固冲汤机制探索平台", layout="wide")
+# ========== 🌟 核心修复区：中文字体加载 ==========
+# 1. 优先尝试加载项目根目录下的字体文件（最稳定）
+local_fonts = ["simhei.ttf", "SimHei.ttf", "msyh.ttc"]
+font_loaded = False
 
+for font_file in local_fonts:
+    if os.path.exists(font_file):
+        try:
+            fm.fontManager.addfont(font_file)
+            font_name = fm.FontProperties(fname=font_file).get_name()
+            plt.rcParams['font.sans-serif'] = [font_name]
+            font_loaded = True
+            break
+        except:
+            pass
+
+# 2. 如果本地没有，尝试加载 Linux 服务器系统自带的字体
+if not font_loaded:
+    sys_fonts = [
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+    ]
+    for sys_font in sys_fonts:
+        if os.path.exists(sys_font):
+            try:
+                fm.fontManager.addfont(sys_font)
+                font_name = fm.FontProperties(fname=sys_font).get_name()
+                plt.rcParams['font.sans-serif'] = [font_name]
+                font_loaded = True
+                break
+            except:
+                pass
+
+# 3. 兜底：如果全部找不到，给个系统默认无衬线（虽然会乱码，但代码不会崩）
+if not font_loaded:
+    plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
+
+# 解决负号显示为方块的问题
+plt.rcParams['axes.unicode_minus'] = False
+# ===============================================
+
+# ========== 页面配置 ==========
+st.set_page_config(
+    page_title="固冲智安",
+    page_icon="🌿",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# ========== 导航菜单 ==========
 st.sidebar.title("导航菜单")
 page = st.sidebar.radio("选择模块", [
     "首页概览",
@@ -15,6 +70,7 @@ page = st.sidebar.radio("选择模块", [
     "成分-靶点网络"
 ])
 
+# ========== 1. 首页概览 ==========
 if page == "首页概览":
     st.title("🌿 补肾固冲汤调控蜕膜巨噬细胞谷氨酸代谢重编程")
     st.subheader("诱导母胎免疫耐受关键机制研究 - 数智化交互平台")
@@ -30,6 +86,7 @@ if page == "首页概览":
     col3.metric("💊 核心方剂", "补肾固冲汤", delta="8味中药")
     col4.metric("🎯 关键靶点", "EAAT1/ACSL4", delta="铁死亡调控")
 
+# ========== 2. 机制通路图 ==========
 elif page == "机制通路图":
     st.subheader("📊 URSA发病机制与补肾固冲汤干预通路")
     st.markdown("""
@@ -45,20 +102,13 @@ elif page == "机制通路图":
         st.markdown("### 🟢 正常妊娠 dM2")
         st.markdown("""
         <div style='background-color: #d4edda; padding: 10px; border-radius: 8px; border: 2px solid green;'>
-            <b>1. EAAT1 正常表达</b><br>
-            ↓<br>
-            <b>2. 谷氨酸正常摄取</b><br>
-            ↓<br>
-            <b>3. α-KG 正常生成</b><br>
-            ↓<br>
-            <b>4. FTO 活性正常</b><br>
-            ↓<br>
-            <b>5. ACSL4 m6A 低修饰</b><br>
-            ↓<br>
-            <b>6. 铁死亡被抑制</b><br>
-            ↓<br>
-            <b style='color: green;'>✅ dM2 正常维持</b><br>
-            ↓<br>
+            <b>1. EAAT1 正常表达</b><br>↓<br>
+            <b>2. 谷氨酸正常摄取</b><br>↓<br>
+            <b>3. α-KG 正常生成</b><br>↓<br>
+            <b>4. FTO 活性正常</b><br>↓<br>
+            <b>5. ACSL4 m6A 低修饰</b><br>↓<br>
+            <b>6. 铁死亡被抑制</b><br>↓<br>
+            <b style='color: green;'>✅ dM2 正常维持</b><br>↓<br>
             <b style='color: blue;'>🛡️ 母胎免疫耐受</b>
         </div>
         """, unsafe_allow_html=True)
@@ -77,60 +127,26 @@ elif page == "机制通路图":
             <b style='font-size: 16px; color: green;'>重塑免疫耐受</b>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.caption("💡 绿色虚线箭头表示调控方向")
 
     with col_right:
         st.markdown("### 🔴 URSA dM2")
         st.markdown("""
         <div style='background-color: #f8d7da; padding: 10px; border-radius: 8px; border: 2px solid red;'>
-            <b>1. EAAT1 表达 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>2. 谷氨酸摄取 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>3. α-KG <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>4. FTO 活性 <span style='color: red;'>↓</span></b><br>
-            ↓<br>
-            <b>5. ACSL4 m6A 修饰 <span style='color: red;'>↑</span></b><br>
-            ↓<br>
-            <b>6. 铁死亡 <span style='color: red;'>↑</span></b><br>
-            ↓<br>
-            <b style='color: red;'>❌ dM2 减少</b><br>
-            ↓<br>
+            <b>1. EAAT1 表达 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>2. 谷氨酸摄取 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>3. α-KG <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>4. FTO 活性 <span style='color: red;'>↓</span></b><br>↓<br>
+            <b>5. ACSL4 m6A 修饰 <span style='color: red;'>↑</span></b><br>↓<br>
+            <b>6. 铁死亡 <span style='color: red;'>↑</span></b><br>↓<br>
+            <b style='color: red;'>❌ dM2 减少</b><br>↓<br>
             <b style='color: red;'>⚠️ 母胎免疫耐受破坏</b>
         </div>
         """, unsafe_allow_html=True)
 
-    with st.expander("📖 点击查看详细机制说明"):
-        st.markdown("""
-        ### 🔬 关键分子事件链
-        | 步骤 | 正常妊娠 | URSA | 补肾固冲汤干预 |
-        |------|----------|------|----------------|
-        | 1. EAAT1 表达 | 正常表达 | **显著下调** | ✅ 上调 EAAT1 |
-        | 2. 谷氨酸摄取 | 正常摄取 | **摄取障碍** | ✅ 恢复摄取 |
-        | 3. α-KG 生成 | 正常生成 | **生成减少** | ✅ 恢复生成 |
-        | 4. FTO 活性 | 正常活性 | **活性降低** | ✅ 恢复活性 |
-        | 5. ACSL4 m6A | 低修饰水平 | **高修饰水平** | ✅ 降低修饰 |
-        | 6. 铁死亡 | 被抑制 | **被激活** | ✅ 抑制铁死亡 |
-        | 7. dM2 数量 | 正常维持 | **显著减少** | ✅ 恢复数量 |
-        | 8. 免疫耐受 | 正常维持 | **被破坏** | ✅ 重建耐受 |
-        ### 🎯 核心结论
-        补肾固冲汤通过 **上调 EAAT1** → 恢复谷氨酸代谢稳态 → 抑制铁死亡 → 重塑母胎免疫耐受。
-        """)
-
+# ========== 3. 数据可视化 ==========
 elif page == "数据可视化":
     st.subheader("📈 预实验数据展示")
-    st.markdown("""
-    以下数据来自本项目前期预实验，展示了 URSA 患者与正常妊娠（NP）对照之间
-    蜕膜巨噬细胞亚群、谷氨酸代谢及铁死亡指标的差异。
-    """)
-    
-    import matplotlib.pyplot as plt
-    import numpy as np
-    
-    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
-    plt.rcParams['axes.unicode_minus'] = False
+    st.markdown("以下数据来自本项目前期预实验，展示了 URSA 患者与正常妊娠（NP）对照之间的差异。")
     
     st.markdown("### 图1. URSA患者蜕膜M1/M2巨噬细胞比例失衡")
     col1, col2 = st.columns(2)
@@ -157,7 +173,6 @@ elif page == "数据可视化":
             <b>📌 关键发现：</b><br><br>
             • NP组：M2型巨噬细胞占 <b style='color: #28a745;'>85%</b>，M1型占 15%<br>
             • URSA组：M2型巨噬细胞降至 <b style='color: #dc3545;'>65%</b>，M1型升至 35%<br>
-            • M1/M2比值在URSA组显著升高（<i>p</i> &lt; 0.01）
         </div>
         """, unsafe_allow_html=True)
     
@@ -211,63 +226,15 @@ elif page == "数据可视化":
             <b>📌 关键发现：</b><br><br>
             • NP组dM2铁死亡水平仅 <b style='color: #28a745;'>10%</b><br>
             • URSA组dM2铁死亡水平显著升至 <b style='color: #dc3545;'>45%</b><br>
-            • 补肾固冲汤处理后降至 <b style='color: #ffc107;'>55%</b>（<i>p</i> &lt; 0.001）
+            • 补肾固冲汤处理后降至 <b style='color: #ffc107;'>55%</b>
         </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("### 图4. 补肾固冲汤上调dM2细胞EAAT1表达")
-    col7, col8 = st.columns(2)
-    
-    with col7:
-        fig5, ax5 = plt.subplots(figsize=(5, 4))
-        eaat1_level = [1.0, 0.4, 0.75, 1.1]
-        eaat1_labels = ['NP', 'URSA', 'URSA+低剂量', 'URSA+高剂量']
-        eaat1_colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8']
-        ax5.bar(eaat1_labels, eaat1_level, color=eaat1_colors)
-        ax5.set_ylabel('EAAT1蛋白表达 (相对倍数)')
-        ax5.set_title('补肾固冲汤对EAAT1表达的调控')
-        ax5.set_ylim(0, 1.4)
-        for i, v in enumerate(eaat1_level):
-            ax5.text(i, v + 0.05, f'{v:.2f}', ha='center', fontweight='bold')
-        st.pyplot(fig5)
-    
-    with col8:
-        st.markdown("""
-        <div style='background-color: #f8f9fa; padding: 15px; border-radius: 8px;'>
-            <b>📌 关键发现：</b><br><br>
-            • URSA组EAAT1表达较NP组下降 <b style='color: #dc3545;'>60%</b><br>
-            • 低剂量补肾固冲汤：恢复至 <b style='color: #ffc107;'>75%</b><br>
-            • 高剂量补肾固冲汤：恢复至 <b style='color: #17a2b8;'>110%</b>（<i>p</i> &lt; 0.01）
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.success("""
-    ### 📊 数据总结
-    1. **巨噬细胞失衡**：URSA患者蜕膜M2型巨噬细胞比例显著降低，M1/M2比值升高
-    2. **代谢异常**：dM2细胞内谷氨酸及α-KG水平特异性下降
-    3. **铁死亡激活**：dM2铁死亡水平显著升高，导致细胞数量减少
-    4. **补肾固冲汤干预**：通过上调EAAT1表达，恢复谷氨酸代谢，抑制铁死亡
-    *以上数据为本项目前期预实验基础，支持项目科学假说。*
-    """)
 
+# ========== 4. 风险预测模型 ==========
 elif page == "风险预测模型":
     st.subheader("🧠 URSA 风险预测模型（演示版）")
-    st.markdown("""
-    ### 模型说明
-    本模型基于 **逻辑回归算法**，利用以下4个关键分子指标预测 URSA 发病风险：
-    - **EAAT1 表达水平**：谷氨酸转运蛋白，dM2细胞特异性标志
-    - **谷氨酸浓度**：反映谷氨酸代谢状态
-    - **α-KG 水平**：三羧酸循环关键中间产物
-    - **ACSL4 m6A 修饰水平**：铁死亡关键调控因子
-    > ⚠️ *当前为演示版本，使用模拟数据训练模型。实际应用需基于临床队列数据。*
-    """)
-    
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.preprocessing import StandardScaler
     
     np.random.seed(42)
-    n_samples = 200
     np_eaat1 = np.random.normal(1.0, 0.2, 100)
     np_glu = np.random.normal(120, 20, 100)
     np_akg = np.random.normal(80, 15, 100)
@@ -276,6 +243,7 @@ elif page == "风险预测模型":
     ursa_glu = np.random.normal(65, 15, 100)
     ursa_akg = np.random.normal(40, 12, 100)
     ursa_acsl4 = np.random.normal(0.8, 0.15, 100)
+    
     X_train = np.vstack([
         np.column_stack([np_eaat1, np_glu, np_akg, np_acsl4]),
         np.column_stack([ursa_eaat1, ursa_glu, ursa_akg, ursa_acsl4])
@@ -285,7 +253,6 @@ elif page == "风险预测模型":
     X_train_scaled = scaler.fit_transform(X_train)
     model = LogisticRegression()
     model.fit(X_train_scaled, y_train)
-    train_acc = model.score(X_train_scaled, y_train)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -301,224 +268,38 @@ elif page == "风险预测模型":
         prob = model.predict_proba(input_scaled)[0][1]
         
         st.markdown("---")
-        st.markdown("### 📊 预测结果")
-        col_result1, col_result2, col_result3 = st.columns([1, 1, 1])
+        col_result1, col_result2 = st.columns(2)
         with col_result1:
             st.metric("URSA风险评分", f"{prob*100:.1f}%")
         with col_result2:
-            if prob < 0.35:
-                st.success("✅ 低风险")
-            elif prob < 0.65:
-                st.warning("⚠️ 中风险")
-            else:
-                st.error("🔴 高风险")
-        with col_result3:
-            st.metric("模型准确率", f"{train_acc*100:.1f}%")
+            if prob < 0.35: st.success("✅ 低风险")
+            elif prob < 0.65: st.warning("⚠️ 中风险")
+            else: st.error("🔴 高风险")
 
+# ========== 5. 成分-靶点网络 ==========
 elif page == "成分-靶点网络":
     st.subheader("🌐 补肾固冲汤“成分-靶点”热力图")
     
-    st.markdown("""
-    ### 网络药理学分析
-    热力图展示了 **补肾固冲汤活性成分** 与 **核心作用靶点** 之间的关联强度，
-    颜色越深表示相互作用越强。
-    > ⚠️ *当前为演示版本，基于公开数据库的预测数据。*
-    """)
-    
-    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS']
-    plt.rcParams['axes.unicode_minus'] = False
-    
     herb_compounds = {
-        '菟丝子': ['金丝桃苷', '山柰酚'],
-        '桑寄生': ['槲皮素', '芦丁'],
-        '阿胶': ['胶原蛋白肽'],
-        '杜仲': ['桃叶珊瑚苷', '京尼平苷酸'],
-        '陈皮': ['橙皮苷', '川陈皮素'],
-        '黄芩': ['黄芩苷', '黄芩素'],
-        '白术': ['白术内酯I'],
-        '甘草': ['甘草酸', '甘草次酸']
+        '菟丝子': ['金丝桃苷', '山柰酚'], '桑寄生': ['槲皮素', '芦丁'],
+        '阿胶': ['胶原蛋白肽'], '杜仲': ['桃叶珊瑚苷', '京尼平苷酸'],
+        '陈皮': ['橙皮苷', '川陈皮素'], '黄芩': ['黄芩苷', '黄芩素'],
+        '白术': ['白术内酯I'], '甘草': ['甘草酸', '甘草次酸']
     }
-    
     targets = ['EAAT1', 'ACSL4', 'FTO', 'GPX4', 'SLC7A11', 'NFE2L2', 'IL10', 'TNF']
-    
     association_data = {
-        '金丝桃苷':   [4, 1, 2, 1, 1, 1, 1, 1],
-        '山柰酚':    [1, 1, 4, 2, 1, 3, 1, 1],
-        '槲皮素':    [1, 1, 1, 1, 4, 2, 1, 1],
-        '芦丁':      [1, 1, 1, 1, 1, 4, 1, 1],
-        '胶原蛋白肽': [1, 1, 1, 1, 1, 1, 3, 1],
-        '桃叶珊瑚苷': [4, 1, 1, 1, 1, 1, 1, 1],
-        '京尼平苷酸': [1, 1, 1, 4, 1, 1, 1, 1],
-        '橙皮苷':    [1, 1, 1, 1, 1, 1, 1, 4],
-        '川陈皮素':   [1, 1, 1, 1, 1, 1, 1, 4],
-        '黄芩苷':    [5, 4, 1, 1, 1, 1, 1, 1],
-        '黄芩素':    [1, 1, 4, 1, 1, 1, 1, 1],
-        '白术内酯I':  [1, 1, 1, 1, 1, 1, 4, 1],
-        '甘草酸':    [1, 4, 1, 1, 1, 3, 1, 1],
-        '甘草次酸':   [1, 1, 1, 4, 1, 1, 1, 1],
+        '金丝桃苷': [4, 1, 2, 1, 1, 1, 1, 1], '山柰酚': [1, 1, 4, 2, 1, 3, 1, 1],
+        '槲皮素': [1, 1, 1, 1, 4, 2, 1, 1], '芦丁': [1, 1, 1, 1, 1, 4, 1, 1],
+        '胶原蛋白肽': [1, 1, 1, 1, 1, 1, 3, 1], '桃叶珊瑚苷': [4, 1, 1, 1, 1, 1, 1, 1],
+        '京尼平苷酸': [1, 1, 1, 4, 1, 1, 1, 1], '橙皮苷': [1, 1, 1, 1, 1, 1, 1, 4],
+        '川陈皮素': [1, 1, 1, 1, 1, 1, 1, 4], '黄芩苷': [5, 4, 1, 1, 1, 1, 1, 1],
+        '黄芩素': [1, 1, 4, 1, 1, 1, 1, 1], '白术内酯I': [1, 1, 1, 1, 1, 1, 4, 1],
+        '甘草酸': [1, 4, 1, 1, 1, 3, 1, 1], '甘草次酸': [1, 1, 1, 4, 1, 1, 1, 1],
     }
-    
     df = pd.DataFrame(association_data, index=targets).T
     
     fig, ax = plt.subplots(figsize=(12, 8))
     cmap = sns.color_palette("Reds", as_cmap=True)
-    sns.heatmap(df, annot=True, fmt='d', cmap=cmap, 
-                cbar_kws={'label': '关联强度'}, 
-                linewidths=0.5, linecolor='white',
-                ax=ax,
-                vmin=0, vmax=5)
+    sns.heatmap(df, annot=True, fmt='d', cmap=cmap, linewidths=0.5, linecolor='white', ax=ax, vmin=0, vmax=5)
     ax.set_title('补肾固冲汤 活性成分-核心靶点 关联热力图', fontsize=16, fontweight='bold')
-    ax.set_xlabel('核心靶点', fontsize=12)
-    ax.set_ylabel('活性成分', fontsize=12)
-    ax.set_xticklabels(targets, rotation=45, ha='right')
     st.pyplot(fig)
-    
-    st.markdown("---")
-    st.markdown("### 📊 按中药分组的成分-靶点关联")
-    for herb, comps in herb_compounds.items():
-        st.markdown(f"**{herb}**：{', '.join(comps)}")
-        if len(comps) == 1:
-            herb_df = df.loc[[comps[0]]]
-        else:
-            herb_df = df.loc[comps]
-        st.dataframe(herb_df, use_container_width=True)
-    
-    # ===== 智能配比与数智化生产模块 =====
-    st.markdown("---")
-    st.markdown("### 🏭 智能配比与数智化生产工艺")
-    st.markdown("""
-    基于 **"四核工艺"** 闭环体系，实现从原料到成品的全程数字化控制：
-    """)
-    
-    col_proc1, col_arrow1, col_proc2, col_arrow2, col_proc3, col_arrow3, col_proc4 = st.columns([2, 0.3, 2, 0.3, 2, 0.3, 2])
-    
-    with col_proc1:
-        st.markdown("""
-        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
-            <h3 style='margin:0;'>❄️</h3>
-            <h4 style='margin:5px 0;'>低温粉碎</h4>
-            <p style='font-size:12px; margin:0;'>热敏成分零流失<br>保全有效成分</p>
-            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺①</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_arrow1:
-        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
-    
-    with col_proc2:
-        st.markdown("""
-        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
-            <h3 style='margin:0;'>🧪</h3>
-            <h4 style='margin:5px 0;'>树脂精制</h4>
-            <p style='font-size:12px; margin:0;'>分离纯化提纯度<br>有效成分转移率↑</p>
-            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺②</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_arrow2:
-        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
-    
-    with col_proc3:
-        st.markdown("""
-        <div style='background: linear-gradient(135deg, #1a5276, #2e86c1); padding: 15px; border-radius: 12px; text-align: center; color: white;'>
-            <h3 style='margin:0;'>📊</h3>
-            <h4 style='margin:5px 0;'>在线检测</h4>
-            <p style='font-size:12px; margin:0;'>批次间一致性<br>提升 <b style='color:#f1c40f;'>30%</b></p>
-            <span style='background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺③</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_arrow3:
-        st.markdown("<p style='font-size:30px; text-align:center; margin-top:40px;'>→</p>", unsafe_allow_html=True)
-    
-    with col_proc4:
-        st.markdown("""
-        <div style='background: linear-gradient(135deg, #d4af37, #f1c40f); padding: 15px; border-radius: 12px; text-align: center; color: #1a5276;'>
-            <h3 style='margin:0;'>⏳</h3>
-            <h4 style='margin:5px 0;'>缓释包衣</h4>
-            <p style='font-size:12px; margin:0;'>血药浓度平稳长效<br>患者依从性提升</p>
-            <span style='background:rgba(26,82,118,0.2); padding:2px 10px; border-radius:10px; font-size:11px;'>工艺④</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("### 📊 智能配比核心指标")
-    
-    col_metric1, col_metric2, col_metric3, col_metric4 = st.columns(4)
-    
-    with col_metric1:
-        st.metric("🏷️ 批次均一性", "提升 30%", delta="vs 传统工艺")
-    with col_metric2:
-        st.metric("📈 有效成分转移率", "≥ 92%", delta="提升 15%")
-    with col_metric3:
-        st.metric("🔗 图码追溯覆盖率", "≥ 95%", delta="全程可追溯")
-    with col_metric4:
-        st.metric("💊 血药浓度平稳度", "CV < 15%", delta="平稳长效")
-    
-    st.markdown("---")
-    st.markdown("### 📱 图码追溯系统 —— 每瓶唯一ID，扫码可查全程")
-    
-    col_trace1, col_trace2 = st.columns([1, 1])
-    
-    with col_trace1:
-        st.markdown("""
-        <div style='background: #f0f4f8; padding: 20px; border-radius: 12px; border-left: 5px solid #1a5276;'>
-            <b>🔍 追溯信息示例</b><br><br>
-            <b>唯一ID：</b>BSGC-2026-001234<br>
-            <b>种植基地：</b>内蒙古通辽市奈曼旗 GAP基地<br>
-            <b>采收时间：</b>2026年8月<br>
-            <b>检测报告：</b>符合《中国药典》标准<br>
-            <b>生产工艺：</b>低温粉碎 → 树脂精制 → 在线检测 → 缓释包衣<br>
-            <b>有效期至：</b>2029年8月
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_trace2:
-        st.markdown("""
-        <div style='background: #1a5276; padding: 20px; border-radius: 12px; color: white; text-align: center;'>
-            <p style='font-size: 60px; margin: 0;'>📱</p>
-            <h3>扫码追溯</h3>
-            <p style='font-size: 14px; opacity: 0.8;'>每瓶唯一ID · 数据采集率 ≥ 95%</p>
-            <div style='background: white; padding: 15px; border-radius: 8px; margin-top: 10px;'>
-                <p style='color: #1a5276; font-size: 12px; margin: 0;'>⬛ 二维码占位 ⬛</p>
-                <p style='color: #1a5276; font-size: 11px; margin: 5px 0 0 0;'>扫码查看完整溯源信息</p>
-            </div>
-            <p style='font-size: 12px; opacity: 0.7; margin-top: 10px;'>从田间到病床 · 全流程可追溯 · 批次间均一</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.info("💡 **从“经验制药”到“数据智造”** —— 以数智化赋能中药智造，守护每一份生育希望")
-    
-    st.success("""
-    ### 🎯 核心发现
-    
-    1. **多成分协同作用**：8味中药的活性成分通过**多靶点**协同发挥治疗作用
-    
-    2. **核心成分**：
-       - **黄芩苷**：同时靶向 EAAT1 和 ACSL4（关联强度最高）
-       - **金丝桃苷、桃叶珊瑚苷**：特异性靶向 EAAT1
-       - **甘草酸**：靶向 ACSL4 和 NFE2L2
-    
-    3. **核心靶点**：
-       - **EAAT1**：谷氨酸转运蛋白，dM2细胞特异性靶点（被6个成分调控）
-       - **ACSL4**：铁死亡关键调控因子（被3个成分调控）
-       - **FTO**：m6A表观遗传调控酶（被2个成分调控）
-    
-    4. **中医理论支撑**：
-       网络结果与 **"肾主生殖"** 理论高度契合，
-       体现了补肾固冲汤 **"多靶点-多通路"** 的系统调控特征。
-    """)
-    
-    with st.expander("🔬 点击查看靶点功能说明"):
-        st.markdown("""
-        | 靶点 | 中文名称 | 功能 | 与URSA关联 |
-        |------|----------|------|------------|
-        | **EAAT1** | 兴奋性氨基酸转运蛋白1 | 谷氨酸跨膜转运 | ★★★★★ 核心 |
-        | **ACSL4** | 长链脂酰CoA合成酶4 | 铁死亡执行基因 | ★★★★★ 核心 |
-        | **FTO** | 脂肪量与肥胖相关蛋白 | m6A去甲基化酶 | ★★★★★ 核心 |
-        | **GPX4** | 谷胱甘肽过氧化物酶4 | 铁死亡抑制因子 | ★★★★☆ 关键 |
-        | **SLC7A11** | 胱氨酸/谷氨酸转运蛋白 | 抗氧化系统 | ★★★★☆ 关键 |
-        | **NFE2L2** | 核因子E2相关因子2 | 氧化应激调控 | ★★★☆☆ 重要 |
-        | **IL10** | 白细胞介素-10 | 抗炎细胞因子 | ★★★☆☆ 重要 |
-        | **TNF** | 肿瘤坏死因子 | 促炎细胞因子 | ★★★☆☆ 重要 |
-        """)
